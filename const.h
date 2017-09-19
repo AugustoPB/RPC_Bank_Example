@@ -5,6 +5,12 @@
 #define BANKVERS	1
 #define TRANSACTION_OP	1
 #define MANAGEMENT_OP 2
+#define CREATE 1
+#define DELETE 2
+#define AUTHENTICATE 3
+#define WITHDRAWAL 4
+#define DEPOSIT 5
+#define BALANCE 6
 
 typedef struct
 {
