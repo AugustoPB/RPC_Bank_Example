@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
       memset(&account, 0, sizeof(account));
 
       printf("First Name: ");
-      scanf("%s", &account.first_name);   
+      scanf("%s", &account.first_name); 
       printf("Last Name: ");
       scanf("%s", &account.last_name);
       printf("CPF: ");
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
       account.type = CREATE;
       account.operation_ID = time(&timer);
       account.operation_ID = (account.operation_ID*100) + account.agency;
-      printf("%d,%d,%s,%s,%s,%d,%d\n",account.type,account.operation_ID,account.first_name,account.last_name,account.cpf,account.account_number,account.agency);
+      printf("%d,%d,%s,%s,%s,%d,%d\n",account.type,account.operation_ID,&account.first_name,&account.last_name,&account.cpf,account.account_number,account.agency);
      /* int stat = callrpc("localhost", OPPROG, OPVERSION, MANAGEMENT_OP,
                (xdrproc_t)xdr_management, (char *)&account,
                (xdrproc_t)xdr_int, (char *)&output );
@@ -41,6 +41,7 @@ int main(int argc, char *argv[])
         clnt_perrno(stat);
         printf("\n");
         return 1;}*/
+       
     }
     else if(!strcmp(input, "delete"))
     {

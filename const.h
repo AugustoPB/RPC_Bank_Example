@@ -16,8 +16,8 @@ typedef struct
 {
   int type;
   int operation_ID;
-  char first_name,last_name;
-  char cpf;
+  char first_name[20],last_name[20];
+  char cpf[20];
   int account_number;
   int agency;
 } MANAGEMENT;
