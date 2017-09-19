@@ -11,6 +11,7 @@
 #define WITHDRAWAL 4
 #define DEPOSIT 5
 #define BALANCE 6
+#define NO_AGENCY -2
 
 typedef struct
 {
