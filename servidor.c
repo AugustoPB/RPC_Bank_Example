@@ -104,6 +104,7 @@ float *transaction_svc(TRANSACTION *operation)
 int main()
 {
 	agencies[0].agency = 1;
+	agencies[1].agency = 2;
 	if	(registerrpc(BANKPROG,BANKVERS,MANAGEMENT_OP,management_svc,
 			     (xdrproc_t)xdr_management,(xdrproc_t)xdr_int ) == -1)  {
 		fprintf(stderr,"Erro em registerrpc()!\n");

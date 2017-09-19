@@ -3,8 +3,9 @@
 #include <time.h>
 
 int rpc_management(char *ip,MANAGEMENT *account){
-      int stat = callrpc(ip, OPPROG, OPVERSION, MANAGEMENT_OP,
-               (xdrproc_t)xdr_management, (char *)&account,
+      int output;
+      int stat = callrpc(ip, BANKPROG, BANKVERS, MANAGEMENT_OP,
+               (xdrproc_t)xdr_management, (char *)account,
                (xdrproc_t)xdr_int, (char *)&output );
       if	(stat!= 0)  {
         clnt_perrno(stat);
@@ -14,7 +15,8 @@ int rpc_management(char *ip,MANAGEMENT *account){
 }
 
 float rpc_transaction(char *ip,TRANSACTION *transaction){
-    int stat = callrpc(ip, OPPROG, OPVERSION, TRANSACTION_OP,
+    int output;
+    int stat = callrpc(ip, BANKPROG, BANKVERS, TRANSACTION_OP,
                (xdrproc_t)xdr_transaction, (char *)&transaction,
                (xdrproc_t)xdr_float, (char *)&output );
       if	(stat!= 0)  {
@@ -26,7 +28,7 @@ float rpc_transaction(char *ip,TRANSACTION *transaction){
 }
 int main(int argc, char *argv[])
 {
-  int agency_number = 2;
+  int agency_number = 1;
   int output;
   char *input;
   size_t inputsize = 32;
@@ -40,24 +42,25 @@ int main(int argc, char *argv[])
     printf(">>>");
     scanf("%s", input);
 
-  
+
     if(!strcmp(input, "create"))
     {
       output = 9;
       memset(&account, 0, sizeof(account));
 
       printf("First Name: ");
-      scanf("%s", account.first_name); 
+      scanf("%s", account.first_name);
       printf("Last Name: ");
       scanf("%s", account.last_name);
       printf("CPF: ");
-      scanf("%s", account.cpf); 
+      scanf("%s", account.cpf);
       account.agency = agency_number;
       account.type = CREATE;
       account.operation_ID = time(&timer);
       account.operation_ID = (account.operation_ID*100) + account.agency;
     //  printf("%d,%d,%s,%s,%s,%d,%d\n",account.type,account.operation_ID,account.first_name,account.last_name,account.cpf,account.account_number,account.agency);
-      output = rpc_management("localhost",&account);
+      output = rpc_management((char *)"localhost",&account);
+      printf("%d\n", output);
 
     }
     else if(!strcmp(input, "delete"))
@@ -72,21 +75,23 @@ int main(int argc, char *argv[])
       account.operation_ID = time(&timer);
       account.operation_ID = (account.operation_ID*100) + account.agency;
     //  printf("%d,%d,%s,%s,%s,%d,%d\n",account.type,account.operation_ID,account.first_name,account.last_name,account.cpf,account.account_number,account.agency);
-      output = rpc_management("localhost",&account);
+      output = rpc_management((char *)"localhost",&account);
+      printf("%d\n", output);
     }
     else if(!strcmp(input, "balance"))
     {
-      memset(&account, 0, sizeof(account));
+      memset(&transaction, 0, sizeof(transaction));
 
       printf("Nº da Conta: \n");
-      scanf("%02d", &account.account_number);
+      scanf("%02d", &transaction.account_number);
       printf("Agencia: \n");
-      scanf("%02d", &account.agency);
-      account.type = BALANCE;
-      account.operation_ID = time(&timer);
-      account.operation_ID = (account.operation_ID*100) + account.agency;
+      scanf("%02d", &transaction.agency);
+      transaction.type = BALANCE;
+      transaction.operation_ID = time(&timer);
+      transaction.operation_ID = (transaction.operation_ID*100) + transaction.agency;
      // printf("%d,%d,%s,%s,%s,%d,%d\n",account.type,account.operation_ID,account.first_name,account.last_name,account.cpf,account.account_number,account.agency);
-      output = rpc_management("localhost",&account);
+      output = rpc_transaction((char *)"localhost",&transaction);
+      printf("%d\n", output);
     }
         else if(!strcmp(input, "authenticate"))
     {
@@ -100,7 +105,8 @@ int main(int argc, char *argv[])
       account.operation_ID = time(&timer);
       account.operation_ID = (account.operation_ID*100) + account.agency;
     //  printf("%d,%d,%s,%s,%s,%d,%d\n",account.type,account.operation_ID,account.first_name,account.last_name,account.cpf,account.account_number,account.agency);
-      output = rpc_management("localhost",&account);
+      output = rpc_management((char *)"localhost",&account);
+      printf("%d\n", output);
     }
     else if(!strcmp(input, "deposit"))
     {
@@ -115,7 +121,8 @@ int main(int argc, char *argv[])
       transaction.operation_ID = time(&timer);
       transaction.operation_ID = (transaction.operation_ID*100) + transaction.agency;
     //  printf("%d,%d,%d,%d,%f\n",transaction.type,transaction.operation_ID,transaction.account_number,transaction.agency,transaction.value);
-      output = rpc_transaction("localhost",&transaction);
+      output = rpc_transaction((char *)"localhost",&transaction);
+      printf("%d\n", output);
     }
     else if(!strcmp(input, "withdrawal"))
     {
@@ -130,7 +137,8 @@ int main(int argc, char *argv[])
       transaction.operation_ID = time(&timer);
       transaction.operation_ID = (transaction.operation_ID*100) + transaction.agency;
      // printf("%d,%d,%d,%d,%f\n",transaction.type,transaction.operation_ID,transaction.account_number,transaction.agency,transaction.value);
-      output = rpc_transaction("localhost",&transaction);
+      output = rpc_transaction((char *)"localhost",&transaction);
+      printf("%d\n", output);
     }
   }
 }
