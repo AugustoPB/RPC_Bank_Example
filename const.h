@@ -17,11 +17,20 @@ typedef struct
 {
   int type;
   int operation_ID;
-  char *first_name,*last_name;
-  char *cpf;
+  char first_name,last_name;
+  char cpf;
   int account_number;
   int agency;
 } MANAGEMENT;
+
+typedef struct
+{
+  int type;
+  int operation_ID;
+  int account_number;
+  int agency;
+  float value;
+} TRANSACTION;
 
 int xdr_management(XDR *xdrsp, MANAGEMENT *operation)
 {
