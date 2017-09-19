@@ -3,11 +3,30 @@
 
 AGENCY agencies[5];
 
-//float deposit(MANAGEMENT *operation)
-//{
-//	agencies[operation->agency-1].accounts[operation->account_number-1].balance += operation-
-//	return
-//}
+float deposit(TRANSACTION *operation)
+{
+	if(agencies[operation->agency-1].agency != operation->agency)
+		return NO_AGENCY;
+	return agencies[operation->agency-1].accounts[operation->account_number-1].balance += operation->value;
+}
+
+float withdrawal(TRANSACTION *operation)
+{
+	if(agencies[operation->agency-1].agency != operation->agency)
+		return NO_AGENCY;
+	int balance = agencies[operation->agency-1].accounts[operation->account_number-1].balance - operation->value;
+	if(balance < 0)
+		return -1;
+	else
+		return balance;
+}
+
+float balance(TRANSACTION *operation)
+{
+	if(agencies[operation->agency-1].agency != operation->agency)
+		return NO_AGENCY;
+	return agencies[operation->agency-1].accounts[operation->account_number-1].balance;
+}
 
 int authentication(MANAGEMENT *operation)
 {
@@ -56,27 +75,47 @@ int delete_account(MANAGEMENT *operation)
 	return 1;
 }
 
-int *obtem_nota_1_svc(MANAGEMENT *operation)
+int *management_svc(MANAGEMENT *operation)
 {
 	static int a;
 	a = 0;
-	if(operation->type == 1)
+	if(operation->type == CREATE)
 		a = create_account(operation);
-	else if(operation->type == 2)
+	else if(operation->type == AUTHENTICATE)
 		a = authentication(operation);
-	else if(operation->type == 3)
+	else if(operation->type == DELETE)
 		a = delete_account(operation);
+	return &a;
+}
+
+float *transaction_svc(TRANSACTION *operation)
+{
+	static float a;
+	a = 0;
+	if(operation->type == WITHDRAWAL)
+		a = withdrawal(operation);
+	else if(operation->type == DEPOSIT)
+		a = deposit(operation);
+	else if(operation->type == BALANCE)
+		a = balance(operation);
 	return &a;
 }
 
 int main()
 {
 	agencies[0].agency = 1;
-	if	(registerrpc(BANKPROG,BANKVERS,MANAGEMENT_OP,obtem_nota_1_svc,
+	if	(registerrpc(BANKPROG,BANKVERS,MANAGEMENT_OP,management_svc,
 			     (xdrproc_t)xdr_management,(xdrproc_t)xdr_int ) == -1)  {
 		fprintf(stderr,"Erro em registerrpc()!\n");
 		exit(1);
 	}
+
+	if	(registerrpc(BANKPROG,BANKVERS,TRANSACTION_OP,transaction_svc,
+			     (xdrproc_t)xdr_transaction,(xdrproc_t)xdr_float ) == -1)  {
+		fprintf(stderr,"Erro em registerrpc()!\n");
+		exit(1);
+	}
+
 	svc_run();
 	fprintf(stderr,"Erro em svc_run()!\n");
 	return 1;
