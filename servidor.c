@@ -3,37 +3,34 @@
 
 AGENCY agencies[5];
 
-//double *obtem_nota_1_svc(struct simple *test)
+//float deposit(MANAGEMENT *operation)
 //{
-//	char **nome = &test->b;
-//	static NOTAS notas[NUM_ALUNOS] = {
-//		{"Alexandre", 9.5},
-//		{"Barbara",   8.5},
-//		{"Joao",      6.5},
-//		{"Maria",     9.0},
-//		{"Paulo",    10.0},
-//		{"Pedro",     7.0}
-//	};
-//	static double erro = -1.0;
-//	int i;
-//
-//	for	(i=0;i<NUM_ALUNOS;++i)
-//		if	(strcmp(notas[i].nome,*nome)==0)
-//			return &(notas[i].nota);
-//	return &erro;
+//	agencies[operation->agency-1].accounts[operation->account_number-1].balance += operation-
+//	return
 //}
+
+int authentication(MANAGEMENT *operation)
+{
+	if(agencies[operation->agency-1].agency != operation->agency)
+		return NO_AGENCY;
+	//return operation->account_number-1;
+	if(agencies[operation->agency-1].accounts[operation->account_number-1].account_number == operation->account_number)
+		return operation->account_number;
+	else
+		return -1;
+}
+
 int create_account(MANAGEMENT *operation)
 {
+	if(agencies[operation->agency-1].agency != operation->agency)
+		return NO_AGENCY;
+
 	ACCOUNT new_account;
 	new_account.first_name = operation->first_name;
 	new_account.last_name = operation->last_name;
 	new_account.cpf = operation->cpf;
 	new_account.agency = operation->agency;
 	new_account.balance = 0;
-
-
-	if(agencies[operation->agency-1].agency != operation->agency)
-		return -2;
 
 	int iterator;
 	for(iterator = 0; iterator < MAX_ACCOUNTS_NUMBER; iterator++)
@@ -48,11 +45,27 @@ int create_account(MANAGEMENT *operation)
 	return -1;
 }
 
-double *obtem_nota_1_svc(MANAGEMENT *operation)
+int delete_account(MANAGEMENT *operation)
 {
-	static double a;
+	int account_number;
+	if(!(account_number = authentication(operation)))
+		return account_number;
+	ACCOUNT account;
 
-	a = create_account(operation);
+	memset(&agencies[operation->agency-1].accounts[operation->account_number-1], 0, sizeof(account));
+	return 1;
+}
+
+int *obtem_nota_1_svc(MANAGEMENT *operation)
+{
+	static int a;
+	a = 0;
+	if(operation->type == 1)
+		a = create_account(operation);
+	else if(operation->type == 2)
+		a = authentication(operation);
+	else if(operation->type == 3)
+		a = delete_account(operation);
 	return &a;
 }
 
@@ -60,7 +73,7 @@ int main()
 {
 	agencies[0].agency = 1;
 	if	(registerrpc(BANKPROG,BANKVERS,MANAGEMENT_OP,obtem_nota_1_svc,
-			     (xdrproc_t)xdr_management,(xdrproc_t)xdr_double ) == -1)  {
+			     (xdrproc_t)xdr_management,(xdrproc_t)xdr_int ) == -1)  {
 		fprintf(stderr,"Erro em registerrpc()!\n");
 		exit(1);
 	}
