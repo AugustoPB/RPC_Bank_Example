@@ -38,12 +38,12 @@ int xdr_management(XDR *xdrsp, MANAGEMENT *operation)
         return (0);
     if (!xdr_int(xdrsp, &operation->operation_ID))
         return (0);
-    if (!xdr_wrapstring(xdrsp, &operation->first_name))
+/*    if (!xdr_wrapstring(xdrsp, &operation->first_name))
         return (0);
     if (!xdr_wrapstring(xdrsp, &operation->last_name))
         return (0);
     if (!xdr_wrapstring(xdrsp, &operation->cpf))
-        return (0);
+        return (0);*/
     if (!xdr_int(xdrsp, &operation->account_number))
         return (0);
     if (!xdr_int(xdrsp, &operation->agency))
