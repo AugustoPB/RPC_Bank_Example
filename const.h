@@ -17,8 +17,8 @@ typedef struct
 {
   int type;
   int operation_ID;
-  char first_name,last_name;
-  char cpf;
+  char first_name[20],last_name[20];
+  char cpf[20];
   int account_number;
   int agency;
 } MANAGEMENT;
@@ -38,15 +38,30 @@ int xdr_management(XDR *xdrsp, MANAGEMENT *operation)
         return (0);
     if (!xdr_int(xdrsp, &operation->operation_ID))
         return (0);
-    if (!xdr_wrapstring(xdrsp, &operation->first_name))
+    if (!xdr_vector(xdrsp, operation->first_name, 20, sizeof(char),(xdrproc_t)xdr_char))
         return (0);
-    if (!xdr_wrapstring(xdrsp, &operation->last_name))
+    if (!xdr_vector(xdrsp, operation->last_name, 20, sizeof(char),(xdrproc_t)xdr_char))
         return (0);
-    if (!xdr_wrapstring(xdrsp, &operation->cpf))
+    if (!xdr_vector(xdrsp, operation->cpf, 20, sizeof(char),(xdrproc_t)xdr_char))
         return (0);
     if (!xdr_int(xdrsp, &operation->account_number))
         return (0);
     if (!xdr_int(xdrsp, &operation->agency))
+        return (0);
+    return (1);
+}
+
+int xdr_transaction(XDR *xdrsp, TRANSACTION *operation)
+{
+    if (!xdr_int(xdrsp, &operation->type))
+        return (0);
+    if (!xdr_int(xdrsp, &operation->operation_ID))
+        return (0);
+    if (!xdr_int(xdrsp, &operation->account_number))
+        return (0);
+    if (!xdr_int(xdrsp, &operation->agency))
+        return (0);
+    if (!xdr_float(xdrsp, &operation->value))
         return (0);
     return (1);
 }

@@ -7,16 +7,17 @@ int main(int argc, char *argv[])
 {
 	//char *pd;
 	int stat;
-	int nota;
 	int out;
+	float value;
 	MANAGEMENT test;
+	TRANSACTION opt;
 
 	test.agency = 1;
-	test.cpf = "4236748";
-	test.first_name = "AUGUSTo";
-	test.last_name = "bergamin";
+	sprintf(test.cpf, "4236748");
+	sprintf(test.first_name, "AUGUSTo");
+	sprintf(test.last_name, "bergamin");
 	test.operation_ID = 201;
-	test.type = 1;
+	test.type = CREATE;
 
 
 	stat = callrpc("localhost", BANKPROG, BANKVERS, MANAGEMENT_OP,
@@ -30,7 +31,7 @@ int main(int argc, char *argv[])
 
 	printf("%d\n", out);
 
-	test.type = 2;
+	test.type = AUTHENTICATE;
 	test.account_number = out;
 
 	stat = callrpc("localhost", BANKPROG, BANKVERS, MANAGEMENT_OP,
@@ -43,41 +44,47 @@ int main(int argc, char *argv[])
 	}
 	printf("%d\n", out);
 
-	test.type = 3;
+	opt.account_number = test.account_number;
+	opt.agency = test.agency;
+	opt.operation_ID = 45678;
+	opt.type = DEPOSIT;
+	opt.value = 250;
 
-	stat = callrpc("localhost", BANKPROG, BANKVERS, MANAGEMENT_OP,
-		       (xdrproc_t)xdr_management, (char *)&test,
-		       (xdrproc_t)xdr_int, (char *)& out);
+	stat = callrpc("localhost", BANKPROG, BANKVERS, TRANSACTION_OP,
+		       (xdrproc_t)xdr_transaction, (char *)&opt,
+		       (xdrproc_t)xdr_float, (char *)& value);
 	if	(stat!= 0)  {
 		clnt_perrno(stat);
 		printf("\n");
 		return 1;
 	}
-	printf("%d\n", out);
+	printf("%f\n", value);
 
-	test.type = 2;
+	opt.type = BALANCE;
 
-	stat = callrpc("localhost", BANKPROG, BANKVERS, MANAGEMENT_OP,
-		       (xdrproc_t)xdr_management, (char *)&test,
-		       (xdrproc_t)xdr_int, (char *)& out);
+	stat = callrpc("localhost", BANKPROG, BANKVERS, TRANSACTION_OP,
+		       (xdrproc_t)xdr_transaction, (char *)&opt,
+		       (xdrproc_t)xdr_float, (char *)& value);
 	if	(stat!= 0)  {
 		clnt_perrno(stat);
 		printf("\n");
 		return 1;
 	}
-	printf("%d\n", out);
+	printf("%f\n", value);
 
-	test.type = 1;
-	stat = callrpc("localhost", BANKPROG, BANKVERS, MANAGEMENT_OP,
-		       (xdrproc_t)xdr_management, (char *)&test,
-		       (xdrproc_t)xdr_int, (char *)&out );
+	opt.type = WITHDRAWAL;
+	opt.value = 130;
+
+	stat = callrpc("localhost", BANKPROG, BANKVERS, TRANSACTION_OP,
+		       (xdrproc_t)xdr_transaction, (char *)&opt,
+		       (xdrproc_t)xdr_float, (char *)& value);
 	if	(stat!= 0)  {
 		clnt_perrno(stat);
 		printf("\n");
 		return 1;
 	}
+	printf("%f\n", value);
 
-	printf("%d\n", out);
 
 
 	return 0;
