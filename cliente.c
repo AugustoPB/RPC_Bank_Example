@@ -1,4 +1,3 @@
-/* cliente.c (Roland Teodorowitsch; 30 ago. 2013 - 31 mar. 2017) */
 
 #include <stdio.h>
 #include <rpc/rpc.h>
@@ -11,13 +10,15 @@ int main(int argc, char *argv[])
 	double nota;
 	MANAGEMENT test;
 
-	if	(argc!=3)  {
-		fprintf(stderr,"Uso:\n%s <nome_do_servidor> <nome>\n\n",argv[0]);
-		return 1;
-	}
-	test.b = argv[2];
-	test.a = 3;
-	stat = callrpc(argv[1], BANKPROG, BANKVERS, MANAGEMENT_OP,
+	test.agency = 1;
+	test.cpf = "4236748";
+	test.first_name = "AUGUSTo";
+	test.last_name = "bergamin";
+	test.operation_ID = 201;
+	test.type = 1;
+
+
+	stat = callrpc("localhost", BANKPROG, BANKVERS, MANAGEMENT_OP,
 		       (xdrproc_t)xdr_management, (char *)&test,
 		       (xdrproc_t)xdr_double, (char *)&nota );
 	if	(stat!= 0)  {
@@ -25,10 +26,6 @@ int main(int argc, char *argv[])
 		printf("\n");
 		return 1;
 	}
-	printf("Nome: %s\n",argv[2]);
-	if	(nota<0.0)
-		printf("Resultado: nome nao encontrado!\n");
-	else
-		printf("Nota: %.1lf\n",nota);
+	printf("%lf\n", nota);
 	return 0;
 }
