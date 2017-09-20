@@ -4,7 +4,8 @@
 
 
 float rpc_transaction(char *ip,TRANSACTION *transaction){
-    int stat = callrpc(ip, OPPROG, OPVERSION, TRANSACTION_OP,
+  float output;
+    int stat = callrpc(ip, BANKPROG, BANKVERS, TRANSACTION_OP,
                (xdrproc_t)xdr_transaction, (char *)transaction,
                (xdrproc_t)xdr_float, (char *)&output );
       if	(stat!= 0)  {
@@ -17,7 +18,7 @@ float rpc_transaction(char *ip,TRANSACTION *transaction){
 
 int main(int argc, char *argv[])
 {
-  int output;
+  float output;
   time_t timer;
   int account_number,operation,agency;
   TRANSACTION transaction;
@@ -40,7 +41,8 @@ int main(int argc, char *argv[])
       transaction.operation_ID = time(&timer);
       transaction.operation_ID = (transaction.operation_ID*100) + transaction.agency;
     //  printf("%d,%d,%d,%d,%f\n",transaction.type,transaction.operation_ID,transaction.account_number,transaction.agency,transaction.value);
-      output = rpc_transaction("localhost",&transaction);
+      output = rpc_transaction((char *)"localhost",&transaction);
+      printf("%f\n", output);
     }
     else if (operation==2){
       memset(&transaction, 0, sizeof(transaction));
@@ -49,8 +51,8 @@ int main(int argc, char *argv[])
       transaction.type = BALANCE;
       transaction.operation_ID = time(&timer);
       transaction.operation_ID = (transaction.operation_ID*100) + transaction.agency;
-      output = rpc_transaction("localhost",&transaction);
-      printf("Balance value: %f",output);
+      output = rpc_transaction((char *)"localhost",&transaction);
+      printf("Balance value: %f\n",output);
     }
     else if (operation==3){
       memset(&transaction, 0, sizeof(transaction));
@@ -62,7 +64,8 @@ int main(int argc, char *argv[])
       transaction.operation_ID = time(&timer);
       transaction.operation_ID = (transaction.operation_ID*100) + transaction.agency;
      // printf("%d,%d,%d,%d,%f\n",transaction.type,transaction.operation_ID,transaction.account_number,transaction.agency,transaction.value);
-      output = rpc_transaction("localhost",&transaction);
+      output = rpc_transaction((char *)"localhost",&transaction);
+      printf("%f\n", output);
     }
     else
     {

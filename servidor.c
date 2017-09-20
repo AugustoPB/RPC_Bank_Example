@@ -7,7 +7,8 @@ float deposit(TRANSACTION *operation)
 {
 	if(agencies[operation->agency-1].agency != operation->agency)
 		return NO_AGENCY;
-	return agencies[operation->agency-1].accounts[operation->account_number-1].balance += operation->value;
+	agencies[operation->agency-1].accounts[operation->account_number-1].balance += operation->value;
+	return agencies[operation->agency-1].accounts[operation->account_number-1].balance;
 }
 
 float withdrawal(TRANSACTION *operation)
@@ -17,7 +18,8 @@ float withdrawal(TRANSACTION *operation)
 	int balance = agencies[operation->agency-1].accounts[operation->account_number-1].balance - operation->value;
 	if(balance < 0)
 		return -1;
-	else
+
+	agencies[operation->agency-1].accounts[operation->account_number-1].balance -= operation->value;
 		return balance;
 }
 
@@ -77,32 +79,78 @@ int delete_account(MANAGEMENT *operation)
 
 int *management_svc(MANAGEMENT *operation)
 {
-	static int a;
-	a = 0;
+	static int output;
+	output = 0;
+
 	if(operation->type == CREATE)
-		a = create_account(operation);
-	else if(operation->type == AUTHENTICATE)
-		a = authentication(operation);
-	else if(operation->type == DELETE)
-		a = delete_account(operation);
-	return &a;
+	{
+		if(agencies[operation->agency-1].last_operation_ID != operation->operation_ID)
+			output = create_account(operation);
+		else
+			output = -4;
+	}
+	else
+	{
+		if(operation->account_number != agencies[operation->agency-1].accounts[operation->account_number].account_number)
+		{
+			output = -5;
+			return &output;
+		}
+		
+		if(operation->type == AUTHENTICATE)
+		{
+				output = authentication(operation);
+
+		}
+		else if(operation->type == DELETE)
+		{
+			if(agencies[operation->agency-1].last_operation_ID != operation->operation_ID)
+				output = delete_account(operation);
+			else
+				output = -4;
+		}
+	}
+
+		agencies[operation->agency-1].last_operation_ID = operation->operation_ID;
+	return &output;
 }
 
 float *transaction_svc(TRANSACTION *operation)
 {
-	static float a;
-	a = 0;
+	static float output;
+	output = 0;
+
+	if(operation->account_number != agencies[operation->agency-1].accounts[operation->account_number].account_number)
+	{
+		output = -5;
+		return &output;
+	}
+
 	if(operation->type == WITHDRAWAL)
-		a = withdrawal(operation);
+	{
+		if(agencies[operation->agency-1].last_operation_ID != operation->operation_ID)
+			output = withdrawal(operation);
+		else
+			output = -4;
+	}
 	else if(operation->type == DEPOSIT)
-		a = deposit(operation);
+	{
+		if(agencies[operation->agency-1].last_operation_ID != operation->operation_ID)
+			output = deposit(operation);
+		else
+			output = -4;
+	}
 	else if(operation->type == BALANCE)
-		a = balance(operation);
-	return &a;
+	{
+			output = balance(operation);
+	}
+	agencies[operation->agency-1].last_operation_ID = operation->operation_ID;
+	return &output;
 }
 
 int main()
 {
+	memset(agencies, 0, sizeof(agencies));
 	agencies[0].agency = 1;
 	agencies[1].agency = 2;
 	if	(registerrpc(BANKPROG,BANKVERS,MANAGEMENT_OP,management_svc,

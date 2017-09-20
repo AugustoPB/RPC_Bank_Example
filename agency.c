@@ -15,9 +15,9 @@ int rpc_management(char *ip,MANAGEMENT *account){
 }
 
 float rpc_transaction(char *ip,TRANSACTION *transaction){
-    int output;
+    float output;
     int stat = callrpc(ip, BANKPROG, BANKVERS, TRANSACTION_OP,
-               (xdrproc_t)xdr_transaction, (char *)&transaction,
+               (xdrproc_t)xdr_transaction, (char *)transaction,
                (xdrproc_t)xdr_float, (char *)&output );
       if	(stat!= 0)  {
         clnt_perrno(stat);
@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
 {
   int agency_number = 1;
   int output;
+  float value;
   char *input;
   size_t inputsize = 32;
   input = (char *)malloc(inputsize*sizeof(char));
@@ -90,8 +91,8 @@ int main(int argc, char *argv[])
       transaction.operation_ID = time(&timer);
       transaction.operation_ID = (transaction.operation_ID*100) + transaction.agency;
      // printf("%d,%d,%s,%s,%s,%d,%d\n",account.type,account.operation_ID,account.first_name,account.last_name,account.cpf,account.account_number,account.agency);
-      output = rpc_transaction((char *)"localhost",&transaction);
-      printf("%d\n", output);
+      value = rpc_transaction((char *)"localhost",&transaction);
+      printf("%f\n", value);
     }
         else if(!strcmp(input, "authenticate"))
     {
@@ -121,8 +122,8 @@ int main(int argc, char *argv[])
       transaction.operation_ID = time(&timer);
       transaction.operation_ID = (transaction.operation_ID*100) + transaction.agency;
     //  printf("%d,%d,%d,%d,%f\n",transaction.type,transaction.operation_ID,transaction.account_number,transaction.agency,transaction.value);
-      output = rpc_transaction((char *)"localhost",&transaction);
-      printf("%d\n", output);
+      value = rpc_transaction((char *)"localhost",&transaction);
+      printf("%f\n", value);
     }
     else if(!strcmp(input, "withdrawal"))
     {
@@ -137,8 +138,8 @@ int main(int argc, char *argv[])
       transaction.operation_ID = time(&timer);
       transaction.operation_ID = (transaction.operation_ID*100) + transaction.agency;
      // printf("%d,%d,%d,%d,%f\n",transaction.type,transaction.operation_ID,transaction.account_number,transaction.agency,transaction.value);
-      output = rpc_transaction((char *)"localhost",&transaction);
-      printf("%d\n", output);
+      value = rpc_transaction((char *)"localhost",&transaction);
+      printf("%f\n", value);
     }
   }
 }
